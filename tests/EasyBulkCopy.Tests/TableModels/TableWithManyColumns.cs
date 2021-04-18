@@ -7,7 +7,7 @@ namespace EasyBulkCopy.Tests.TableModels
     {
         public const string SqlToCreate = @"
             create table TableWithManyColumns (
-                Id int, Name nvarchar(100), ForeignKey uniqueidentifier, created datetimeoffset, IsActive bit
+                Id int, Name nvarchar(100), ForeignKey uniqueidentifier, Created datetimeoffset, IsActive bit
             )";
         
         public int Id { get; set; }

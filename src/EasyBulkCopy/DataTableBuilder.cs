@@ -19,9 +19,9 @@ namespace EasyBulkCopy
             _tableTemplate = CreateTableTemplate(bulkMapping.Properties, bulkMapping.TableName);
         }
 
+        public Type Type => typeof(TTable);
         public IReadOnlyList<PropertyDescriptor> Properties => _bulkMapping.Properties;
         public IReadOnlyList<SqlBulkCopyColumnMapping> Columns => _bulkMapping.Columns;
-        public bool AppliesTo(Type type) => type == typeof(TTable);
 
         public DataTable MapToTable<T>(IEnumerable<T> records) where T : class
         {

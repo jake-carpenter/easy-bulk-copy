@@ -3,6 +3,7 @@
     [BulkTableName(nameof(TableWithBool))]
     public class TableWithBool
     {
-        public string ColumnName { get; set; }
+        public const string SqlToCreate = "create table TableWithBool (ColumnName bit)";
+        public bool ColumnName { get; set; }
     }
 }

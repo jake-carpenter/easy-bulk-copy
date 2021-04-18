@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyBulkCopy", "src\EasyBul
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyBulkCopy.Tests", "tests\EasyBulkCopy.Tests\EasyBulkCopy.Tests.csproj", "{E30BAF38-16FE-4A8C-845F-9549165AC17D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyBulkCopy.TestApp", "tests\EasyBulkCopy.TestApp\EasyBulkCopy.TestApp.csproj", "{F669528C-2FB5-464C-B295-BFD0B830D651}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{E30BAF38-16FE-4A8C-845F-9549165AC17D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E30BAF38-16FE-4A8C-845F-9549165AC17D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E30BAF38-16FE-4A8C-845F-9549165AC17D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F669528C-2FB5-464C-B295-BFD0B830D651}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F669528C-2FB5-464C-B295-BFD0B830D651}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F669528C-2FB5-464C-B295-BFD0B830D651}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F669528C-2FB5-464C-B295-BFD0B830D651}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -8,9 +8,9 @@ namespace EasyBulkCopy
 {
     public interface IDataTableBuilder
     {
+        Type Type { get; }
         IReadOnlyList<SqlBulkCopyColumnMapping> Columns { get; }
         IReadOnlyList<PropertyDescriptor> Properties { get; }
-        bool AppliesTo(Type type);
         DataTable MapToTable<T>(IEnumerable<T> records) where T : class;
     }
 }
