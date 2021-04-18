@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,9 +21,9 @@ namespace EasyBulkCopy.TestApp
             // Initialize fake DB - it will throw a ton of errors while building container.
             var dbEnvironment = new DatabaseEnvironment();
             services.AddSingleton(_ => dbEnvironment);
-            
+
             services.UseEasyBulkCopy();
-            services.RegisterBulkInsertType<TestTable>();
+            services.RegisterBulkInsertTypesInAssembly(Assembly.GetExecutingAssembly());
             services.AddControllers();
         }
 

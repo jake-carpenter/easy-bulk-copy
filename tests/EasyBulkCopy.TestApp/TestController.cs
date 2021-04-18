@@ -28,16 +28,17 @@ namespace EasyBulkCopy.TestApp
             var connectionString =
                 $"Server=localhost,{port};Database=master;User Id=sa;Password={DatabaseEnvironment.DbPassword}";
 
-            
+
             var records = AutoFaker.Generate<TestTable>(10);
             await _bulkInserter.Insert(connectionString, records);
-            
+
             var results = new SqlConnection(connectionString)
                 .Query<TestTable>("SELECT * FROM dbo.TestTable");
-            
+
             if (results.Count() != 10)
                 throw new Exception("Invalid insert");
 
+            Console.WriteLine("Worked");
             return Ok();
         }
     }
