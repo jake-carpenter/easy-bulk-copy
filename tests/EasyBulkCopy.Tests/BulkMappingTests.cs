@@ -88,14 +88,13 @@ namespace EasyBulkCopy.Tests
         public void BulkMapping_MapsTablesWithManyProperties_ToProperties()
         {
             var sut = new BulkMapping<TableWithManyColumns>();
-            sut.Properties.Select(p => p.Name).Should().BeEquivalentTo(new[]
-            {
-                nameof(TableWithManyColumns.Id),
-                nameof(TableWithManyColumns.Name),
-                nameof(TableWithManyColumns.ForeignKey),
-                nameof(TableWithManyColumns.Created),
-                nameof(TableWithManyColumns.IsActive)
-            });
+            sut.Properties.Select(p => p.Name).Should().BeEquivalentTo(
+                new[]
+                {
+                    nameof(TableWithManyColumns.Id), nameof(TableWithManyColumns.Name),
+                    nameof(TableWithManyColumns.ForeignKey), nameof(TableWithManyColumns.Created),
+                    nameof(TableWithManyColumns.IsActive)
+                });
         }
 
         [Fact]
@@ -172,14 +171,13 @@ namespace EasyBulkCopy.Tests
         public void BulkMapping_MapsTablesWithManyProperties_ToColumns()
         {
             var sut = new BulkMapping<TableWithManyColumns>();
-            sut.Columns.Select(p => p.DestinationColumn).Should().BeEquivalentTo(new[]
-            {
-                nameof(TableWithManyColumns.Id),
-                nameof(TableWithManyColumns.Name),
-                nameof(TableWithManyColumns.ForeignKey),
-                nameof(TableWithManyColumns.Created),
-                nameof(TableWithManyColumns.IsActive)
-            });
+            sut.Columns.Select(p => p.DestinationColumn).Should().BeEquivalentTo(
+                new[]
+                {
+                    nameof(TableWithManyColumns.Id), nameof(TableWithManyColumns.Name),
+                    nameof(TableWithManyColumns.ForeignKey), nameof(TableWithManyColumns.Created),
+                    nameof(TableWithManyColumns.IsActive)
+                });
         }
 
         [Fact]
@@ -190,6 +188,13 @@ namespace EasyBulkCopy.Tests
             act.Should().Throw<Exception>()
                 .WithMessage(
                     $"No {nameof(BulkTableNameAttribute)} on DummyBrokenTableWithNoAttribute.");
+        }
+
+        [Fact]
+        public void BulkMapping_ExcludesProperties_WithComputedAttribute()
+        {
+            new BulkMapping<TableWithComputedColumn>().Columns.Should().NotContain(
+                c => c.DestinationColumn == nameof(TableWithComputedColumn.IdIsEven));
         }
 
         private class DummyBrokenTableWithNoAttribute

@@ -25,7 +25,7 @@ namespace EasyBulkCopy.Tests
             var rows = AutoFaker.Generate<TableWithManyColumns>(10);
             var bulkMapping = new BulkMapping<TableWithManyColumns>();
             var dataTableBuilder = new DataTableBuilder<TableWithManyColumns>(bulkMapping);
-            var sut = new BulkInserter(new[] {dataTableBuilder});
+            var sut = new BulkInserter(new[] { dataTableBuilder });
 
             await sut.Insert(_fixture.ConnectionString, rows);
 
@@ -43,10 +43,8 @@ namespace EasyBulkCopy.Tests
             var boolTableBuilder = new DataTableBuilder<TableWithBool>(boolMapping);
             var guidTableBuilder = new DataTableBuilder<TableWithGuid>(guidMapping);
             var rows = AutoFaker.Generate<TableWithManyColumns>(10);
-            var sut = new BulkInserter(new IDataTableBuilder[]
-            {
-                boolTableBuilder, guidTableBuilder, fullTableBuilder
-            });
+            var sut = new BulkInserter(
+                new IDataTableBuilder[] { boolTableBuilder, guidTableBuilder, fullTableBuilder });
 
             await sut.Insert(_fixture.ConnectionString, rows);
 
@@ -60,9 +58,23 @@ namespace EasyBulkCopy.Tests
             var row = AutoFaker.Generate<TableWithManyColumns>();
             var sut = new BulkInserter(Array.Empty<IDataTableBuilder>());
 
-            Func<Task> act = () => sut.Insert(_fixture.ConnectionString, new[] {row});
+            Func<Task> act = () => sut.Insert(_fixture.ConnectionString, new[] { row });
 
             await act.Should().ThrowAsync<BulkCopyRegistrationNotFound>();
+        }
+
+        [Fact]
+        public async Task BulkInserter_Inserts_IntoTablesWithComputedProperty()
+        {
+            var mapping = new BulkMapping<TableWithComputedColumn>();
+            var builder = new DataTableBuilder<TableWithComputedColumn>(mapping);
+            var sut = new BulkInserter(new[] { builder });
+            var rows = new[] { AutoFaker.Generate<TableWithComputedColumn>() };
+
+            await sut.Insert(_fixture.ConnectionString, rows);
+
+            _fixture.GetAllRecordsInTable<TableWithComputedColumn>(nameof(TableWithComputedColumn))
+                .Should().ContainSingle();
         }
     }
 }

@@ -26,7 +26,8 @@ namespace EasyBulkCopy
             return TypeDescriptor
                 .GetProperties(typeof(T))
                 .Cast<PropertyDescriptor>()
-                .Where(property => property?.PropertyType?.Namespace?.Equals("System") ?? false);
+                .Where(property => property?.PropertyType?.Namespace?.Equals("System") ?? false)
+                .Where(property => property?.Attributes.Contains(new ComputedAttribute()) == false);
         }
 
         private static IEnumerable<SqlBulkCopyColumnMapping> BuildColumnList(IEnumerable<PropertyDescriptor> properties)

@@ -71,6 +71,7 @@ namespace EasyBulkCopy.Tests
             await _connection.ExecuteAsync("drop table TableWithManyColumns");
             await _connection.ExecuteAsync("drop table TableWithBool");
             await _connection.ExecuteAsync("drop table TableWithGuid");
+            await _connection.ExecuteAsync("drop table TableWithComputedColumn");
             await CreateTestTables(_connection);
         }
 
@@ -84,6 +85,7 @@ namespace EasyBulkCopy.Tests
             await connection.ExecuteAsync(TableWithManyColumns.SqlToCreate);
             await connection.ExecuteAsync(TableWithBool.SqlToCreate);
             await connection.ExecuteAsync(TableWithGuid.SqlToCreate);
+            await connection.ExecuteAsync(TableWithComputedColumn.SqlToCreate);
         }
     }
 }
