@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using AutoBogus;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
-using TestEnvironment.Docker;
-using TestEnvironment.Docker.Containers.Mssql;
 
 namespace EasyBulkCopy.TestApp
 {
@@ -24,7 +22,6 @@ namespace EasyBulkCopy.TestApp
         [HttpGet("/test")]
         public async Task<IActionResult> Test()
         {
-
             var records = AutoFaker.Generate<TestTable>(10);
             await _bulkInserter.Insert(_environment.ConnectionString, records);
 
