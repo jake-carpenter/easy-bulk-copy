@@ -32,19 +32,14 @@ namespace EasyBulkCopy.Tests
 
         public string ConnectionString { get; private set; }
 
-        public List<T> GetAllRecordsInTable<T>(string tableName)
-        {
-            return _connection.Query<T>($"select * from {tableName}").ToList();
-        }
-
         public async Task InitializeAsync()
         {
             try
             {
                 if (_container.State != ServiceRunningState.Running)
                 {
-                    var x = _container.Start();
-                    x.WaitForMessageInLogs("The tempdb database has", 30000);
+                    _container.Start();
+                    _container.WaitForMessageInLogs("The tempdb database has", 30000);
                 }
 
 
@@ -59,19 +54,24 @@ namespace EasyBulkCopy.Tests
             }
         }
 
+        public Task DisposeAsync()
+        {
+            _connection?.Dispose();
+
+            return Task.CompletedTask;
+        }
+
+        public List<T> GetAllRecordsInTable<T>(string tableName)
+        {
+            return _connection.Query<T>($"select * from {tableName}").ToList();
+        }
+
         public async Task ClearTables()
         {
             await _connection.ExecuteAsync("drop table TableWithManyColumns");
             await _connection.ExecuteAsync("drop table TableWithBool");
             await _connection.ExecuteAsync("drop table TableWithGuid");
             await CreateTestTables(_connection);
-        }
-
-        public Task DisposeAsync()
-        {
-            _connection?.Dispose();
-
-            return Task.CompletedTask;
         }
 
         private static SqlConnection GetConnection(string connectionString)

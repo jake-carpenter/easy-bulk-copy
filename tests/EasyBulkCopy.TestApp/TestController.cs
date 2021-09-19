@@ -24,15 +24,11 @@ namespace EasyBulkCopy.TestApp
         [HttpGet("/test")]
         public async Task<IActionResult> Test()
         {
-            var port = _environment.Container.Ports.Values.First();
-            var connectionString =
-                $"Server=localhost,{port};Database=master;User Id=sa;Password={DatabaseEnvironment.DbPassword}";
-
 
             var records = AutoFaker.Generate<TestTable>(10);
-            await _bulkInserter.Insert(connectionString, records);
+            await _bulkInserter.Insert(_environment.ConnectionString, records);
 
-            var results = new SqlConnection(connectionString)
+            var results = new SqlConnection(_environment.ConnectionString)
                 .Query<TestTable>("SELECT * FROM dbo.TestTable");
 
             if (results.Count() != 10)

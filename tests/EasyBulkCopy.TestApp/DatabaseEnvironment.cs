@@ -1,47 +1,45 @@
-﻿using System;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using TestEnvironment.Docker;
-using TestEnvironment.Docker.Containers.Mssql;
+using Ductus.FluentDocker.Builders;
+using Ductus.FluentDocker.Services;
+using Ductus.FluentDocker.Services.Extensions;
 
 namespace EasyBulkCopy.TestApp
 {
-    public class DatabaseEnvironment : IDisposable
+    public class DatabaseEnvironment
     {
-        public const string DbName = "TestAppDb";
-        public const string DbPassword = "p4$4w0rd";
-        private readonly DockerEnvironment _environment;
-
-        public DatabaseEnvironment()
+        public DatabaseEnvironment(DatabaseConfig config)
         {
-            _environment = new DockerEnvironmentBuilder()
-                .AddMssqlContainer(DbName, DbPassword)
+            var container = new Builder()
+                .UseContainer()
+                .UseImage("mcr.microsoft.com/mssql/server:2019-latest")
+                .WithEnvironment("ACCEPT_EULA=Y", $"SA_PASSWORD={config.Password}")
+                .WithName("easy-bulk-copy-test-app-db")
+                .ReuseIfExists()
+                .ExposePort(config.Port, 1433)
                 .Build();
 
-            _environment.Up().Wait();
-            Container = _environment.GetContainer<MssqlContainer>(DbName);
+            if (container.State != ServiceRunningState.Running)
+            {
+                container.Start();
+                container.WaitForMessageInLogs("The tempdb database has", 30000);
+            }
 
-            var port = Container.Ports.Values.First();
-            var connectionString = $"Server=localhost,{port};Database=master;User Id=sa;Password={DbPassword}";
-            using var connection = GetConnection(connectionString);
+            ConnectionString = $"Server=localhost,{config.Port};Database=master;User Id=sa;Password={config.Password}";
+            using var connection = GetConnection(ConnectionString);
             CreateTestTables(connection).Wait();
         }
-        
-        public MssqlContainer Container { get; }
 
-        public void Dispose()
-        {
-            _environment?.Dispose();
-        }
-        
+        public string ConnectionString { get; }
+
         private static SqlConnection GetConnection(string connectionString)
         {
             return new SqlConnection(connectionString);
         }
 
-        private static Task CreateTestTables(SqlConnection connection)
+        private static Task CreateTestTables(IDbConnection connection)
         {
             return connection.ExecuteAsync(TestTable.SqlToCreate);
         }
