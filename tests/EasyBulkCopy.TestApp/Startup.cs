@@ -15,11 +15,13 @@ namespace EasyBulkCopy.TestApp
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Initialize fake DB - it will throw a ton of errors while building container.
-            var dbEnvironment = new DatabaseEnvironment();
+            var databaseConfig = new DatabaseConfig();
+            var section = Configuration.GetSection(nameof(DatabaseConfig));
+            section.Bind(databaseConfig);
+
+            var dbEnvironment = new DatabaseEnvironment(databaseConfig);
             services.AddSingleton(_ => dbEnvironment);
 
             services.UseEasyBulkCopy();
@@ -27,7 +29,6 @@ namespace EasyBulkCopy.TestApp
             services.AddControllers();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseHttpsRedirection();

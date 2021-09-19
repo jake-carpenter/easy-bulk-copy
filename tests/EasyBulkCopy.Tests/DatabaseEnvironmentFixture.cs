@@ -3,52 +3,67 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using Ductus.FluentDocker.Builders;
+using Ductus.FluentDocker.Services;
+using Ductus.FluentDocker.Services.Extensions;
 using EasyBulkCopy.Tests.TableModels;
-using TestEnvironment.Docker;
-using TestEnvironment.Docker.Containers.Mssql;
 using Xunit;
 
 namespace EasyBulkCopy.Tests
 {
     public class DatabaseEnvironmentFixture : IAsyncLifetime
     {
-        private const string DbName = "TestDb";
-        private const string DbPassword = "p4$4w0rd";
-        private readonly DockerEnvironment _environment;
+        private readonly IContainerService _container;
         private SqlConnection _connection;
-        private MssqlContainer _container;
 
         public DatabaseEnvironmentFixture()
         {
-            _environment = new DockerEnvironmentBuilder()
-                .AddMssqlContainer(DbName, DbPassword)
+            _container = new Builder()
+                .UseContainer()
+                .UseImage("mcr.microsoft.com/mssql/server:2019-latest")
+                .KeepContainer()
+                .KeepRunning()
+                .WithEnvironment("ACCEPT_EULA=Y", $"SA_PASSWORD=Password123")
+                .WithName("easy-bulk-copy-test-db")
+                .ReuseIfExists()
+                .ExposePort(15232, 1433)
                 .Build();
         }
 
         public string ConnectionString { get; private set; }
 
-        public List<T> GetAllRecordsInTable<T>(string tableName)
-        {
-            return _connection.Query<T>($"select * from {tableName}").ToList();
-        }
-
         public async Task InitializeAsync()
         {
             try
             {
-                await _environment.Up();
-                _container = _environment.GetContainer<MssqlContainer>(DbName);
+                if (_container.State != ServiceRunningState.Running)
+                {
+                    _container.Start();
+                    _container.WaitForMessageInLogs("The tempdb database has", 30000);
+                }
 
-                var port = _container.Ports.Values.First();
-                ConnectionString = $"Server=localhost,{port};Database=master;User Id=sa;Password={DbPassword}";
+
+                ConnectionString = $"Server=localhost,15232;Database=master;User Id=sa;Password=Password123";
                 _connection = GetConnection(ConnectionString);
                 await CreateTestTables(_connection);
             }
             catch
             {
-                DisposeAsync().Wait();
+                await DisposeAsync();
                 throw;
             }
+        }
+
+        public Task DisposeAsync()
+        {
+            _connection?.Dispose();
+
+            return Task.CompletedTask;
+        }
+
+        public List<T> GetAllRecordsInTable<T>(string tableName)
+        {
+            return _connection.Query<T>($"select * from {tableName}").ToList();
         }
 
         public async Task ClearTables()
@@ -57,16 +72,6 @@ namespace EasyBulkCopy.Tests
             await _connection.ExecuteAsync("drop table TableWithBool");
             await _connection.ExecuteAsync("drop table TableWithGuid");
             await CreateTestTables(_connection);
-        }
-
-        public async Task DisposeAsync()
-        {
-            _connection?.Dispose();
-            if (_environment != null)
-            {
-                await _environment.Down();
-                await _environment.DisposeAsync();
-            }
         }
 
         private static SqlConnection GetConnection(string connectionString)
