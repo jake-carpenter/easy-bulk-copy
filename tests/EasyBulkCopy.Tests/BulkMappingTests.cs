@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Linq;
 using EasyBulkCopy.Tests.TableModels;
 using FluentAssertions;
@@ -181,13 +182,13 @@ namespace EasyBulkCopy.Tests
         }
 
         [Fact]
-        public void BulkMapping_ThrowsError_WhenTypeHasNoBulkTableNameAttrubute()
+        public void BulkMapping_ThrowsError_WhenTypeHasNoBulkTableNameAttribute()
         {
-            Func<object> act = () => new BulkMapping<DummyBrokenTableWithNoAttribute>();
+            Func<object> act = () => new BulkMapping<DummyBrokenTableWithNoBulkTableAttribute>();
 
             act.Should().Throw<Exception>()
                 .WithMessage(
-                    $"No {nameof(BulkTableNameAttribute)} on DummyBrokenTableWithNoAttribute.");
+                    $"No {nameof(BulkTableNameAttribute)} on DummyBrokenTableWithNoBulkTableAttribute.");
         }
 
         [Fact]
@@ -197,7 +198,47 @@ namespace EasyBulkCopy.Tests
                 c => c.DestinationColumn == nameof(TableWithComputedColumn.IdIsEven));
         }
 
-        private class DummyBrokenTableWithNoAttribute
+        [Fact]
+        public void BulkMapping_AcceptsSqlBulkOptions_ByDefault()
+        {
+            new BulkMapping<TableWithInt>().Options.Should().Be(SqlBulkCopyOptions.Default);
+        }
+
+        [Fact]
+        public void BulkMapping_AcceptsSqlBulkOptions()
+        {
+            new BulkMapping<DummyTableWithFireTriggersSqlBulkOptions>()
+                .Options.Should().Be(SqlBulkCopyOptions.FireTriggers);
+        }
+
+        [Fact]
+        public void BulkMapping_AcceptsMultipleSqlBulkOptions()
+        {
+            new BulkMapping<DummyTableWithMultipleSqlBulkOptions>()
+                .Options.Should().Be(SqlBulkCopyOptions.FireTriggers | SqlBulkCopyOptions.KeepIdentity | SqlBulkCopyOptions.TableLock);
+        }
+
+        [Fact]
+        public void BulkMapping_AcceptsSqlBulkCopyOptions()
+        {
+        }
+
+        private class DummyBrokenTableWithNoBulkTableAttribute
+        {
+            public int Id { get; set; }
+        }
+
+
+        [BulkTableName("dbo.Test", SqlBulkCopyOptions.FireTriggers)]
+        private class DummyTableWithFireTriggersSqlBulkOptions
+        {
+            public int Id { get; set; }
+        }
+
+        [BulkTableName(
+            "dbo.Test",
+            SqlBulkCopyOptions.FireTriggers | SqlBulkCopyOptions.KeepIdentity | SqlBulkCopyOptions.TableLock)]
+        private class DummyTableWithMultipleSqlBulkOptions
         {
             public int Id { get; set; }
         }

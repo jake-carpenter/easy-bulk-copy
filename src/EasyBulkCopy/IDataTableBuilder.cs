@@ -11,6 +11,7 @@ namespace EasyBulkCopy
         Type Type { get; }
         IReadOnlyList<SqlBulkCopyColumnMapping> Columns { get; }
         IReadOnlyList<PropertyDescriptor> Properties { get; }
+        SqlBulkCopyOptions Options { get; }
         DataTable MapToTable<T>(IEnumerable<T> records) where T : class;
     }
 }

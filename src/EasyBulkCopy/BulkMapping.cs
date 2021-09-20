@@ -6,13 +6,16 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("EasyBulkCopy.Tests")]
+
 namespace EasyBulkCopy
 {
     internal class BulkMapping<T> where T : class
     {
         public BulkMapping()
         {
-            TableName = GetTableName();
+            var attribute = GetBulkTableNameAttribute();
+            TableName = attribute.TableName;
+            Options = attribute.Options;
             Properties = GetProperties().ToArray();
             Columns = BuildColumnList(Properties).ToList();
         }
@@ -20,6 +23,7 @@ namespace EasyBulkCopy
         public string TableName { get; }
         public IReadOnlyList<PropertyDescriptor> Properties { get; }
         public IReadOnlyList<SqlBulkCopyColumnMapping> Columns { get; }
+        public SqlBulkCopyOptions Options { get; }
 
         private static IEnumerable<PropertyDescriptor> GetProperties()
         {
@@ -39,14 +43,12 @@ namespace EasyBulkCopy
             }
         }
 
-        private static string GetTableName()
+        private static BulkTableNameAttribute GetBulkTableNameAttribute()
         {
-            var attribute = typeof(T)
-                                .GetCustomAttributes(typeof(BulkTableNameAttribute), false)
-                                .FirstOrDefault() as BulkTableNameAttribute
-                            ?? throw new Exception($"No {nameof(BulkTableNameAttribute)} on {typeof(T).Name}.");
-
-            return attribute?.TableName;
+            return typeof(T)
+                       .GetCustomAttributes(typeof(BulkTableNameAttribute), false)
+                       .FirstOrDefault() as BulkTableNameAttribute
+                   ?? throw new Exception($"No {nameof(BulkTableNameAttribute)} on {typeof(T).Name}.");
         }
     }
 }

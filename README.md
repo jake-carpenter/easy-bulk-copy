@@ -60,3 +60,16 @@ public class Foo
     }
 }
 ```
+
+## Provide custom `SqlBulkCopyOptions` when defining your tables
+Optionally customize using the `BulkTableName` attribute. Defaults to `SqlBulkCopyOptions.Default`.
+
+```csharp
+[BulkTableName("dbo.MyTable", SqlBulkCopyOptions.TableLock | SqlBulkCopyOptions.KeepIdentity)]
+public class MyTable
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
+}
+```
