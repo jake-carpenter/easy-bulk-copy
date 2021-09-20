@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 
 namespace EasyBulkCopy
 {
@@ -10,6 +11,12 @@ namespace EasyBulkCopy
             TableName = tableName;
         }
 
+        public BulkTableNameAttribute(string tableName, SqlBulkCopyOptions sqlBulkCopyOptions) : this(tableName)
+        {
+            Options = sqlBulkCopyOptions;
+        }
+
         public string TableName { get; }
+        public SqlBulkCopyOptions Options { get; }
     }
 }

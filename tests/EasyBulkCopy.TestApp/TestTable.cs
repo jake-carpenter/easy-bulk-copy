@@ -1,6 +1,8 @@
-﻿namespace EasyBulkCopy.TestApp
+﻿using System.Data.SqlClient;
+
+namespace EasyBulkCopy.TestApp
 {
-    [BulkTableName("dbo.TestTable")]
+    [BulkTableName("dbo.TestTable", SqlBulkCopyOptions.KeepIdentity)]
     public class TestTable
     {
         public const string SqlToCreate = @"

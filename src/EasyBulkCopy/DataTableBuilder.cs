@@ -22,6 +22,7 @@ namespace EasyBulkCopy
         public Type Type => typeof(TTable);
         public IReadOnlyList<PropertyDescriptor> Properties => _bulkMapping.Properties;
         public IReadOnlyList<SqlBulkCopyColumnMapping> Columns => _bulkMapping.Columns;
+        public SqlBulkCopyOptions Options => _bulkMapping.Options;
 
         public DataTable MapToTable<T>(IEnumerable<T> records) where T : class
         {

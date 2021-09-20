@@ -20,7 +20,7 @@ namespace EasyBulkCopy
             var dataTableBuilder = GetTableBuilder(typeof(T));
             var table = dataTableBuilder.MapToTable<T>(records);
 
-            using (var bulkCopy = new SqlBulkCopy(connectionString, SqlBulkCopyOptions.TableLock))
+            using (var bulkCopy = new SqlBulkCopy(connectionString, dataTableBuilder.Options))
             {
                 bulkCopy.BatchSize = records.Count;
                 bulkCopy.DestinationTableName = table.TableName;
