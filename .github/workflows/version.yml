@@ -1,0 +1,29 @@
+name: .NET
+
+on:
+  push:
+    branches: [ '**.**' ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore -c Release src/EasyBulkCopy/EasyBulkCopy.csproj
+    - name: Test
+      run: dotnet test -c Release tests/EasyBulkCopy.Tests/EasyBulkCopy.Tests.csproj
+    - name: Publish Nuget
+      uses: brandedoutcast/publish-nuget@v2.5.5
+      with:
+        PROJECT_FILE_PATH: src/EasyBulkCopy/EasyBulkCopy.csproj
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        VERSION_FILE_PATH: src/EasyBulkCopy/VERSION
