@@ -1,3 +1,7 @@
+# DEPRECATED
+
+I lost access to the MS account that owns the NuGet package for this project. A replacement project is planned. - May 31, 2024
+
 # EasyBulkCopy
 Easy and automatic mapping for SqlBulkCopy
 
